@@ -40,7 +40,7 @@
           <template #body="{ data }">
             <Button icon="pi pi-eye" severity="info" tooltip="Ver Orçamento" rounded text
               @click="navigateToBudget(data.id)" />
-            <Button icon="pi pi-file" severity="success" tooltip="Gerar PDF" @click="generatePDF(data)" rounded text />
+            <Button icon="pi pi-file" severity="success" tooltip="Gerar PDF"  rounded text />
             <Button icon="pi pi-trash" severity="danger" @click="handleDeleteBudget(data.id)" tooltip="Excluir" rounded
               text />
           </template>
@@ -109,7 +109,7 @@ import Select from 'primevue/select'
 import Tag from 'primevue/tag'
 import Toast from 'primevue/toast'
 
-import { ref, onMounted, createApp } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useConfirm } from 'primevue/useconfirm'
@@ -118,9 +118,8 @@ import { useToast } from 'primevue/usetoast'
 import { useBudgetStore } from '../stores/budgetStore'
 import type { BudgetData, BudgetStatus } from '../interfaces'
 
-import { pdfService } from '../services/pdf'
 
-import PrintLayout from '../components/PrintLayout.vue'
+
 
 const router = useRouter()
 const confirm = useConfirm()
@@ -158,44 +157,7 @@ const handleStatusChange = async (budget: BudgetData) => {
   }
 }
 
-const generatePDF = async (budget: BudgetData) => {
-  try {
-    // Criar um elemento temporário para o layout de impressão
-    const printElement = document.createElement('div')
-    printElement.className = 'print-layout'
 
-    // Criar uma instância do Vue para renderizar o componente
-    const app = createApp(PrintLayout, { budget })
-    app.mount(printElement)
-
-    // Aguardar um momento para garantir que o componente foi renderizado
-    await new Promise(resolve => setTimeout(resolve, 100))
-
-    // Gerar o PDF
-    await pdfService.generatePDF(
-      printElement,
-      `orcamento-${budget.id.toString().padStart(4, '0')}.pdf`
-    )
-
-    // Limpar
-    app.unmount()
-
-    toast.add({
-      severity: 'success',
-      summary: 'Sucesso',
-      detail: 'PDF gerado com sucesso!',
-      life: 3000
-    })
-  } catch (error) {
-    console.error('Erro ao gerar PDF:', error)
-    toast.add({
-      severity: 'error',
-      summary: 'Erro',
-      detail: 'Erro ao gerar o PDF',
-      life: 3000
-    })
-  }
-}
 
 const navigateToBudget = (id: string) => {
   router.push(`/orcamento/${id}`)
